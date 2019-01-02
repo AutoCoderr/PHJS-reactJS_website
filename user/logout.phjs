@@ -1,0 +1,23 @@
+<?phjs
+if (typeof(PHJS.args.POST.token) != "undefined") {
+	if (typeof(PHJS.global.sessions) == "undefined") {
+		echo_json ({rep: "failed", errors: ["Vous n'êtes pas connecté"]});
+	} else {
+		var exist = false;
+		for (var i=0;i<PHJS.global.sessions.length;i++) {
+			if (PHJS.global.sessions[i].token == PHJS.args.POST.token.content) {
+				PHJS.global.sessions.splice(i,1);
+				exist = true;
+			}
+		}
+		if (exist == false) {
+			echo_json ({rep: "failed"});
+		} else {
+			echo_json ({rep: "success"});
+		}
+	}
+} else {
+	echo_json ({rep: "failed", errors: ["token non spécifié"]});
+}
+--END--
+?>

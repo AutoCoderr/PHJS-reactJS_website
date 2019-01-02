@@ -1,0 +1,54 @@
+<?phjs
+var errors = [];
+
+if (typeof(PHJS.args.POST.token) == "undefined") {
+	errors.push('Token non renseigné');
+} else if (PHJS.args.POST.token.content == "") {
+	errors.push('Token non renseigné');
+}
+
+if (typeof(PHJS.args.POST.toSet) == "undefined") {
+	errors.push('toSet non renseigné');
+} else if (PHJS.args.POST.toSet.content == "") {
+	errors.push('toSet non renseigné');
+}
+
+if (typeof(PHJS.args.POST.id) == "undefined") {
+	errors.push('id non renseigné');
+} else if (PHJS.args.POST.id.content == "") {
+	errors.push('id non renseigné');
+}
+
+if (errors.length == 0) {
+	if (typeof(PHJS.global.sessions) == "undefined") {
+	PHJS.global.sessions = [];
+	}
+	var perm = false;
+	for (var i=0;i<PHJS.global.sessions.length; i++) {
+		if (PHJS.global.sessions[i].token == PHJS.args.POST.token.content) {
+			perm = PHJS.global.sessions[i].perm;
+		}
+	}
+	if (perm == false) {
+		echo_json ({rep: "failed", errors: ["Vous n'êtes pas connecté"]});
+		--END--
+	} else if (perm != "superadmin") {
+		echo_json ({rep: "failed", errors: ["Vous n'avez pas les permissions néccessaires"]});
+		--END--
+	} else {
+		var Controleur = require(PHJS.cd+"/../controleur/controleur.js");
+		var controleur = new Controleur();
+		controleur.banUnban(PHJS.args.POST.toSet.content,PHJS.args.POST.id.content, (error,result) => {
+			if (error) {
+				echo_json({rep: "failed", errors: [error]});
+			} else {
+				echo_json ({rep: "success"});
+			}
+			--END--
+		});
+	}
+} else {
+	echo_json({rep: "failed", errors: errors});
+	--END--
+}
+?>

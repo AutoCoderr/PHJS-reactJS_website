@@ -1,0 +1,17 @@
+<?phjs
+if (typeof(PHJS.args.POST.token) != "undefined") {
+	if (typeof(PHJS.global.sessions) == "undefined") {
+		PHJS.global.sessions = [];
+		echo_json ({rep: "success", logged: "no"});
+	} else {
+		if (PHJS.libs.isConnect(PHJS.global.sessions,PHJS.args.POST.token.content)) {
+			echo_json({rep: "success", logged: "yes"});
+		} else {
+			echo_json({rep: "success", logged: "no"});
+		}
+	}
+} else {
+	echo_json ({rep: "failed"});
+}
+--END--
+?>

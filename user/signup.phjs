@@ -1,0 +1,71 @@
+<?phjs
+var errors = [];
+
+if (typeof(PHJS.args.POST.prenom) == "undefined") {
+	errors.push("Prenom non renseigné");
+} else if (PHJS.args.POST.prenom.content == "") {
+	errors.push("Prenom non renseigné");
+}
+
+if (typeof(PHJS.args.POST.nom) == "undefined") {
+	errors.push("Nom non renseigné");
+} else if (PHJS.args.POST.nom.content == "") {
+	errors.push("Nom non renseigné");
+}
+
+if (typeof(PHJS.args.POST.age) == "undefined") {
+	errors.push("Age non renseigné");
+} else if (PHJS.args.POST.age.content == "") {
+	errors.push("Age non renseigné");
+}
+
+if (typeof(PHJS.args.POST.password) == "undefined") {
+	errors.push("Mot de passe non renseigné");
+} else if (PHJS.args.POST.password.content == "") {
+	errors.push("Mot de passe non renseigné");
+}
+
+if (typeof(PHJS.args.POST.token) == "undefined") {
+	errors.push("Token non renseigné");
+} else if (PHJS.args.POST.token.content == "") {
+	errors.push("Token non renseigné");
+}
+
+if (errors.length == 0) {
+	var Controleur = require(PHJS.cd+"/../controleur/controleur.js");
+	var controleur = new Controleur();
+
+	var prenom = PHJS.args.POST.prenom.content;
+	var nom = PHJS.args.POST.nom.content;
+	var metier = PHJS.args.POST.metier.content;
+	var age = PHJS.args.POST.age.content;
+	var password = PHJS.args.POST.password.content;
+
+	controleur.signUp(prenom,nom,password,metier,age,"user", (error,result) => {
+		if (error) {
+			echo_json({rep: "failed", errors: [error]});
+		} else {
+			if (result == "ALREADY_EXIST") {
+				echo_json({rep: "failed", errors: ["Ce compte existe déjà"]});
+			} else {
+				if (typeof(PHJS.global.sessions) == "undefined") {
+					PHJS.global.sessions = [];
+				}
+				if (PHJS.args.POST.token.content != 0) {
+					for (var i=0;i<PHJS.global.sessions.length;i++) {
+						if (PHJS.args.POST.token.content == PHJS.global.sessions[i].token) {
+							PHJS.global.sessions.splice(i,1);
+						}
+					}
+				}
+				PHJS.global.sessions.push(result);
+				echo_json({rep: "success", infos: result});
+			}
+		}
+		--END--
+	});
+} else {
+	echo_json({rep: "failed", errors: errors});
+	--END--
+}
+?>
