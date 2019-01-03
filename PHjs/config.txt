@@ -1,0 +1,3 @@
+forbidden: /.git/,/controleur,/modele;
+
+option(/): file .gitignore is forbidden;
