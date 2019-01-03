@@ -1,0 +1,63 @@
+<?phjs
+
+var errors = [];
+
+if (typeof(PHJS.args.POST.token) == "undefined") {
+	errors.push("Token non renseigné");
+} else if (PHJS.args.POST.token.content == "") {
+	errors.push("Token non renseigné");
+}
+
+if (typeof(PHJS.args.POST.nom) == "undefined") {
+	errors.push("Nom non renseigné");
+} else if (PHJS.args.POST.nom.content == "") {
+	errors.push("Nom non renseigné");
+}
+
+if (typeof(PHJS.args.POST.description) == "undefined") {
+	errors.push("Description non renseigné");
+} else if (PHJS.args.POST.description.content == "") {
+	errors.push("Description non renseigné");
+}
+
+if (typeof(PHJS.args.POST.statut) == "undefined") {
+	errors.push("Statut non renseigné");
+} else if (PHJS.args.POST.statut.content == "") {
+	errors.push("Statut non renseigné");
+}
+
+if (errors.length == 0) {
+
+	var id = false;
+	for (var i=0;i<PHJS.global.sessions.length;i++) {
+		if (PHJS.global.sessions[i].token == PHJS.args.POST.token.content) {
+			id = PHJS.global.sessions[i]._id;
+		}
+	}
+
+	if (id === false) {
+		echo_json({rep: "failed", errors: "Vous n'êtes pas connecté"});
+		--END--
+	} else {
+
+		var nom = PHJS.args.POST.nom.content;
+		var description = PHJS.args.POST.description.content;
+		var statut = PHJS.args.POST.statut.content
+
+		var Controleur = require(PHJS.cd+"/../controleur/controleur.js");
+		var controleur = new Controleur();
+
+		controleur.addJouet(id,nom,description,statut,(error,result) => {
+			if (error) {
+				echo_json({rep: "failed", errors: [error]});
+			} else {
+				echo_json ({rep: "success"});
+			}
+			--END--
+		});
+	}
+} else {
+	echo_json ({rep: "failed", errors: errors});
+	--END--
+}
+?>
