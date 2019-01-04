@@ -2,7 +2,7 @@ function Controleur() {
 
   this.Modele = require(__dirname+"/../modele/modele.js");
 
-  this.modele = new this.Modele("db","127.0.0.1","27017");
+  this.modele = new this.Modele("jsProject","127.0.0.1","27017");
 
   this.login = (prenom,nom,passwd,callback) => {
 
@@ -221,9 +221,7 @@ function Controleur() {
         } else {
           var jouets = result[0].jouets;
 
-          var ObjectID = require('mongodb').ObjectID;
-          var idJouet = new ObjectID();
-          idJouet = idJouet.toString();
+          var idJouet = result[0].jouets.length+1;
 
           var newJouet = {id: idJouet, nom: nom, description: description, statut: statut};
 
@@ -236,6 +234,40 @@ function Controleur() {
               callback(null,newJouet);
             }
           });
+        }
+      }
+    });
+  }
+
+  this.supprJouet = (idUser,idJouet,callback) => {
+    this.modele.getFrom("users",{_id: idUser}, (error,result) => {
+      if (error) {
+        callback(error);
+      } else {
+        if (result.length == 0) {
+          callback("Votre session n'a pas été trouvée dans la base de données");
+        } else {
+          var jouets = result[0].jouets;
+
+          var deleted = false;
+
+          for (var i=0;i<jouets.length;i++) {
+            if (jouets[i].id == idJouet) {
+              jouets.splice(i,1);
+              deleted = true;
+            }
+          }
+          if (deleted === false) {
+            callback("Ce jouet n'a pas été trouvé");
+          } else {
+            this.modele.update("users",{_id: idUser},{$set: {jouets: jouets}}, (error,result) => {
+              if (error) {
+                callback(error);
+              } else {
+                callback(null);
+              }
+            });
+          }
         }
       }
     });
