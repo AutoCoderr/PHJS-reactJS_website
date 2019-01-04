@@ -9,7 +9,7 @@ export class Logout extends React.Component {
     }
     disconnect = event => {
 		$.post(
-			'http://127.0.0.1:8000/user/logout.phjs',
+			'http://'+window.location.hostname+':8000/user/logout.phjs',
 			{
 				token: JSON.parse(localStorage.getItem("session")).token
 			},

@@ -17,7 +17,7 @@ export class Login extends React.Component {
     }
     send = event => {
 		$.post(
-			'http://127.0.0.1:8000/user/login.phjs',
+			'http://'+window.location.hostname+':8000/user/login.phjs',
 			{
 				prenom: this.state.prenom,
                 nom: this.state.nom,

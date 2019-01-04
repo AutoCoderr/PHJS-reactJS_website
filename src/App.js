@@ -5,8 +5,9 @@ import { Signup } from './components/Signup.js';
 import { Fiche } from './components/Fiche.js';
 import { Admin } from './components/Admin.js';
 import { Index } from './components/Index.js';
+import { MesJouets } from './components/MesJouets.js';
 //import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from "react-bootstrap";
-import { Button, Navbar, Nav, NavItem, NavDropdown, MenuItem } from "reactstrap";
+//import { Button, Navbar, Nav, NavItem, NavDropdown, MenuItem } from "reactstrap";
 import $ from 'jquery';
 import './App.css';
 
@@ -18,7 +19,7 @@ class App extends Component {
 		}
 		if (isAuth == 1) {
 			$.post(
-				'http://127.0.0.1:8000/user/islogged.phjs',
+				'http://'+window.location.hostname+':8000/user/islogged.phjs',
 				{
 					token: JSON.parse(localStorage.getItem("session")).token
 				},
@@ -48,6 +49,7 @@ class App extends Component {
                     <Route exact path ="/signup" component={Signup} />
                     <Route exact path ="/fiche" component={Fiche} />
                     <Route exact path ="/admin" component={Admin} />
+                    <Route exact path ="/mesjouets" component={MesJouets} />
                 </Switch>
             </div>
         </div>
@@ -71,13 +73,20 @@ function Header() {
 
   			<div class="collapse navbar-collapse" id="navbarSupportedContent">
     			<ul class="navbar-nav mr-auto">
-    				{isAuth == 1 && 
-    					(
-    					<li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "fiche") ? "active nav-item" : "nav-item"}>
-            				<a class="nav-link" href="/fiche">Fiche</a>
-          				</li>
-    					)
-    				}
+            {isAuth == 1 && 
+              (
+              <li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "mesjouets") ? "active nav-item" : "nav-item"}>
+                    <a class="nav-link" href="/mesjouets">Mes jouets</a>
+              </li>
+              )
+            }
+            {isAuth == 1 && 
+              (
+              <li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "fiche") ? "active nav-item" : "nav-item"}>
+                    <a class="nav-link" href="/fiche">Fiche</a>
+              </li>
+              )
+            }
     				{(isAuth == 1 && (JSON.parse(localStorage.getItem("session")).perm == "admin" | JSON.parse(localStorage.getItem("session")).perm == "superadmin")) ? (
           				<li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "admin") ? "active nav-item" : "nav-item"}>
             				<a class="nav-link" href="/admin">Administration</a>
@@ -85,17 +94,17 @@ function Header() {
           			) : ""}
             	</ul>
             	<ul class="nav navbar-nav navbar-right">
-        			<li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "signup") ? "active nav-item" : "nav-item"}>
+        			 <li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "signup") ? "active nav-item" : "nav-item"}>
         				<a class="nav-link" href="/signup">
         					<span class="glyphicon glyphicon-user"></span>
         						Inscription
         				</a>
-        			</li>
+        			 </li>
 
-    				<li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "login") ? "active nav-item" : "nav-item"}><a class="nav-link" href="/login"><span class="glyphicon glyphicon-log-in">
-    					</span>{isAuth == 1 ? "Deconnexion" : "Connexion"}</a>
-    				</li>
-      			</ul>
+    				    <li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "login") ? "active nav-item" : "nav-item"}><a class="nav-link" href="/login"><span class="glyphicon glyphicon-log-in">
+    					   </span>{isAuth == 1 ? "Deconnexion" : "Connexion"}</a>
+    				    </li>
+      			 </ul>
     		</div>
 		</nav>
 	)

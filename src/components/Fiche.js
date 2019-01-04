@@ -105,7 +105,7 @@ class ChangePasswd extends React.Component {
             return;
         }
         $.post(
-            'http://127.0.0.1:8000/user/changepasswd.phjs',
+            'http://'+window.location.hostname+':8000/user/changepasswd.phjs',
             {
                 passwd: this.state.passwdA,
                 token: JSON.parse(localStorage.getItem("session")).token

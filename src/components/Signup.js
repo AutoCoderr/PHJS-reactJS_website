@@ -27,7 +27,7 @@ export class Signup extends React.Component {
             token = JSON.parse(localStorage.getItem("session")).token;
         }
         $.post(
-            'http://127.0.0.1:8000/user/signup.phjs',
+            'http://'+window.location.hostname+':8000/user/signup.phjs',
             {
                 prenom: this.state.prenom,
                 nom: this.state.nom,

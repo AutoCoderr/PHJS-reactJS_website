@@ -47,7 +47,7 @@ class OtherFiches extends React.Component {
         }
         this.setState({getFicheStarted: true});
         $.post(
-            'http://127.0.0.1:8000/admin/getfiches.phjs',
+            'http://'+window.location.hostname+':8000/admin/getfiches.phjs',
             {
                 token: JSON.parse(localStorage.getItem("session")).token
             },
@@ -71,7 +71,7 @@ class OtherFiches extends React.Component {
             toSet = 1;
         }
         $.post(
-            'http://127.0.0.1:8000/admin/banUnban.phjs',
+            'http://'+window.location.hostname+':8000/admin/banUnban.phjs',
             {
                 toSet: toSet,
                 id: id,
@@ -198,7 +198,7 @@ class FormuAdmin extends React.Component {
             return;
         }
         $.post(
-            'http://127.0.0.1:8000/admin/signupAdmin.phjs',
+            'http://'+window.location.hostname+':8000/admin/signupAdmin.phjs',
             {
                 prenom: this.state.prenom,
                 nom: this.state.nom,
