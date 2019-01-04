@@ -63,45 +63,45 @@ function Header() {
 		isAuth = 1;
 	}
 	return (
-		<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
-  			<a class="navbar-brand" title="Sommaire" href="/">
+		<nav className="navbar navbar-expand-lg bg-dark navbar-dark">
+  			<a className="navbar-brand" title="Sommaire" href="/">
   				<span>Site de merde</span>
   			</a>
-  			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-	    		<span class="navbar-toggler-icon"></span>
+  			<button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+	    		<span className="navbar-toggler-icon"></span>
   			</button>
 
-  			<div class="collapse navbar-collapse" id="navbarSupportedContent">
-    			<ul class="navbar-nav mr-auto">
+  			<div className="collapse navbar-collapse" id="navbarSupportedContent">
+    			<ul className="navbar-nav mr-auto">
             {isAuth == 1 && 
               (
               <li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "mesjouets") ? "active nav-item" : "nav-item"}>
-                    <a class="nav-link" href="/mesjouets">Mes jouets</a>
+                    <a className="nav-link" href="/mesjouets">Mes jouets</a>
               </li>
               )
             }
             {isAuth == 1 && 
               (
               <li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "fiche") ? "active nav-item" : "nav-item"}>
-                    <a class="nav-link" href="/fiche">Fiche</a>
+                    <a className="nav-link" href="/fiche">Fiche</a>
               </li>
               )
             }
     				{(isAuth == 1 && (JSON.parse(localStorage.getItem("session")).perm == "admin" | JSON.parse(localStorage.getItem("session")).perm == "superadmin")) ? (
           				<li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "admin") ? "active nav-item" : "nav-item"}>
-            				<a class="nav-link" href="/admin">Administration</a>
+            				<a className="nav-link" href="/admin">Administration</a>
           				</li>
           			) : ""}
             	</ul>
-            	<ul class="nav navbar-nav navbar-right">
+            	<ul className="nav navbar-nav navbar-right">
         			 <li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "signup") ? "active nav-item" : "nav-item"}>
-        				<a class="nav-link" href="/signup">
-        					<span class="glyphicon glyphicon-user"></span>
+        				<a className="nav-link" href="/signup">
+        					<span className="glyphicon glyphicon-user"></span>
         						Inscription
         				</a>
         			 </li>
 
-    				    <li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "login") ? "active nav-item" : "nav-item"}><a class="nav-link" href="/login"><span class="glyphicon glyphicon-log-in">
+    				    <li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "login") ? "active nav-item" : "nav-item"}><a className="nav-link" href="/login"><span className="glyphicon glyphicon-log-in">
     					   </span>{isAuth == 1 ? "Deconnexion" : "Connexion"}</a>
     				    </li>
       			 </ul>

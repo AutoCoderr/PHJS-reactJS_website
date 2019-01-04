@@ -39,6 +39,7 @@ export class Signup extends React.Component {
     
             (data) => {
                 if (data.rep == "success") {
+                    //window.alert("success")
                     this.setState({success: true, errors: []});
                     if (localStorage.getItem("session") != null) {
                         localStorage.removeItem("session");
@@ -48,6 +49,8 @@ export class Signup extends React.Component {
                         window.location = "/";
                     },250);
                 } else if (data.rep == "failed") {
+                    //window.alert("ERROR");
+                    //console.log(data.errors);
                     this.setState({success: false, errors: data.errors});
                 }
             },
@@ -61,7 +64,7 @@ export class Signup extends React.Component {
     }
     render() {
         return(
-            <div className="Signup">
+            <div>
                 <FormGroup controlId="prenom" bsSize="large">
                 <ControlLabel>Prenom</ControlLabel>
                 <FormControl autoFocus type="text" value={this.state.prenom} onChange={this.handleChange}/>
@@ -87,7 +90,7 @@ export class Signup extends React.Component {
                 <FormControl value={this.state.cpassword} onChange={this.handleChange} type="password"/>
                 </FormGroup>
                 {this.state.success == true && <font color='green' size='4'>Connexion réussi!!</font>}
-                {this.state.errors.map((error) => (<div><font size='3' color='red'> - {error}</font><br/></div>))}
+                {this.state.errors.map((error) => (<div key={error}><font size='3' color='red'> - {error}</font><br/></div>))}
                 <Button
                 onClick={this.send}
                 block

@@ -46,16 +46,16 @@ export class Index extends React.Component {
 		{Object.keys(this.state.comptes).map((id, index) => (
 			<td>
 				<table>
-					<tr>
-						<td>
-							{this.state.comptes[id].prenom} {this.state.comptes[id].nom}
+					<tr style={{border: '1pt solid black'}}>
+						<td style={{textAlign: 'center'}}>
+							<strong>{this.state.comptes[id].prenom} {this.state.comptes[id].nom}</strong>
 						</td>
 					</tr>
 					{this.state.comptes[id].jouets.length == 0 && (<tr><td><font color='orange' size='3'>Il n'y a aucun jouet</font></td></tr>)}
 					{this.state.comptes[id].jouets.map((jouet) => (
-						<tr>
+						<tr style={{border: '1pt solid black'}}>
 							{/* [{id: 1, nom: "Sniper", description: "nique t'a mere"}] */}
-							<td>
+							<td style={{textAlign: 'center'}}>
 								{jouet.nom}
 								<br/>
 								<img src={'http://'+window.location.hostname+':8000/imgs/jouets/'+jouet.id+'.jpg'} />

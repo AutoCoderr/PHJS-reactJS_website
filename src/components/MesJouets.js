@@ -7,34 +7,39 @@ export class MesJouets extends React.Component {
 		super(props);
 		this.state = {
 			jouets: JSON.parse(localStorage.getItem("session")).jouets,
+			comptes: undefined
 		}
+		this.listComptes();
 	}
 
-    supprJouet = (i) => {
-    	var id = this.state.jouets[i].id;
-
-    	$.post(
-            'http://'+window.location.hostname+':8000/jouets/supprJouets.phjs',
-            {
-               id: id,
-               token: JSON.parse(localStorage.getItem("session")).token
-            },
+	listComptes = () => {
+		$.post(
+           'http://'+window.location.hostname+':8000/jouets/getAllJouets.phjs',
+           {
+                
+           },
     
-            (data) => {
-                if (data.rep == "success") {
-                	this.state.jouets[i].errors = [];
-                	this.state.jouets[i].success = true;
-                	var session = JSON.parse(localStorage.getItem("session"));
-                	session.jouets.splice(i,1);
-                	localStorage.setItem("session", JSON.stringify(session));
-                	setTimeout( () => { window.location.href = "/mesjouets"; },250);
-                } else if (data.rep == "failed") {
-                    this.setState({success: false, errors: data.errors, nomJouet: "", descriptionJouet: "", statutJouet: {value: ""}});
-                }
-            },
-            'json'
-        );
+           (data) => {
+               if (data.rep == "success") {
+               		for (var id in data.comptes) {
+               	   		if (data.comptes[id].prenom == JSON.parse(localStorage.getItem("session")).prenom
+               	   		  & data.comptes[id].nom == JSON.parse(localStorage.getItem("session")).nom) {
+               	   			delete data.comptes[id];
+               	   		}
+               	    }
+                   this.setState({errors: []});
+                   console.log("data.comptes : ");
+                   console.log(data.comptes);
+                   console.log("("+typeof(data.comptes)+")")
+                   this.setState({comptes: data.comptes});
+               } else if (data.rep == "failed") {
+                   this.setState({success: false, errors: data.errors});
+               }
+           },
+           'json'
+       );
 	}
+
 
     render() {
 		var isAuth = 0;
@@ -48,10 +53,8 @@ export class MesJouets extends React.Component {
 		<tbody>
 		{this.state.jouets.length == 0 && (<font size='4' color='orange'>Aucun jouet</font>)}
 		{Object.keys(this.state.jouets).map((i, index) => (
-			<tr>
-				{typeof(this.state.jouets[i].errors) == "undefined" && (this.state.jouets[i].errors = [])}
-				{typeof(this.state.jouets[i].success) == "undefined" && (this.state.jouets[i].success = false)}
-				<td style={{border: '1pt solid black'}}>
+			<tr key={i} style={{border: '1pt solid black'}}>
+				<td style={{textAlign: 'center'}}>
 					{this.state.jouets[i].nom}
 					<br/>
 					<img src={'http://'+window.location.hostname+':8000/imgs/jouets/'+this.state.jouets[i].id+'.jpg'} />
@@ -60,17 +63,9 @@ export class MesJouets extends React.Component {
 					<br/>
 					'{this.state.jouets[i].statut}'
 				</td>
-				<td>
-					<Button 
-						onClick={() => this.supprJouet(i)} 
-						block 
-						bsSize="little"
-          				type="submit"
-					>
-					Supprimer
-					</Button>
-					{this.state.jouets[i].success === true && (<font color='green' size='3'>Suppression reussi!!</font>)}
-				</td>
+				{typeof(this.state.comptes) !== "undefined" && (
+					<MenuJouet comptes={this.state.comptes} jouetIndex={i} jouet={this.state.jouets[i]} />
+				)}
 			</tr>
 		))}
 		</tbody>
@@ -80,6 +75,145 @@ export class MesJouets extends React.Component {
         )
     }
 }
+// uioijpokp
+class MenuJouet extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			success: false,
+			errorsSuppr: [],
+      errorsDemand: [],
+			jouetsDst: [],
+			jouetDst: {value: ""},
+			trocCompteDst: {value: ""},
+			comptes: props.comptes,
+			jouet: props.jouet,
+			jouetIndex: props.jouetIndex,
+			ready: false
+		}
+		console.log("props : ");
+		console.log(props);
+		this.displayJouets.bind(this);
+		this.demmandTroc.bind(this);
+	}
+
+	displayJouets = () =>  {
+		if (this.state.trocCompteDst.value === "") {
+			this.setState({jouetsDst: []});
+			return;
+		}
+		var trocCompteDst = this.state.trocCompteDst.value;
+		this.setState({jouetsDst: this.state.comptes[trocCompteDst].jouets});
+	}
+
+	supprJouet = () => {
+    	var id = this.state.jouet.id;
+
+    	$.post(
+            'http://'+window.location.hostname+':8000/jouets/supprJouets.phjs',
+            {
+               idJouet: id,
+               token: JSON.parse(localStorage.getItem("session")).token
+            },
+    
+            (data) => {
+                if (data.rep == "success") {
+                	this.setState({success: true, errorsSuppr: []})
+                	var session = JSON.parse(localStorage.getItem("session"));
+                	session.jouets.splice(this.state.jouetIndex,1);
+                	localStorage.setItem("session", JSON.stringify(session));
+                	setTimeout( function() { window.location.href = "/mesjouets"; },250);
+                } else if (data.rep == "failed") {
+                    this.setState({success: false, errorsSuppr: data.errors});
+                }
+            },
+            'json'
+        );
+	}
+
+	demmandTroc = () => {
+		$.post(
+            'http://'+window.location.hostname+':8000/jouets/demandTroc.phjs',
+            {
+               idJouetDst: this.state.jouetDst.value,
+               idCompteDst: this.state.trocCompteDst.value,
+               idJouetSrc: this.state.jouet.id,
+               token: JSON.parse(localStorage.getItem("session")).token
+            },
+    
+            (data) => {
+                if (data.rep == "success") {
+                	this.setState({success: true, errorsDemand: []});
+                } else if (data.rep == "failed") {
+                  this.setState({success: false, errorsDemand: data.errors});
+                }
+            },
+            'json'
+        );
+	}
+
+	render() {
+		return (
+			<section>
+			<td style={{display: 'block'}}>
+				<Button 
+					onClick={() => this.supprJouet()} 
+					block 
+					bsSize="xs"
+          			type="submit"
+				>
+				Supprimer
+				</Button>
+        {this.state.errorsSuppr.map((error) => (
+            <div><font color='red' size='3'>{error}</font><br/></div>
+        ))}
+				<FormGroup controlId="trocCompteDst">
+          	<ControlLabel>Troquer avec : </ControlLabel>
+          	<FormControl
+          		onChange={() => this.displayJouets()}
+           			inputRef={ el => this.state.trocCompteDst = el}
+          			componentClass="select" placeholder="select">
+           			<option value="">Choisir</option>
+        			{Object.keys(this.state.comptes).map((id, index) => (
+          			<option key={id} value={id}>{this.state.comptes[id].prenom} {this.state.comptes[id].nom}</option>
+        			))}
+        		</FormControl>
+       	 </FormGroup>
+       	 {this.state.jouetsDst.length > 0 && (
+       			<FormGroup controlId="jouetDst">
+        		  <ControlLabel>Quel jouet : </ControlLabel>
+	       	    <FormControl
+	       	    	onChange={() => { this.state.jouetDst.value !== "" ? (this.setState({ready: true})) : (this.setState({ready: false}))} }
+            		inputRef={ el => this.state.jouetDst = el}
+              	componentClass="select" placeholder="select">
+              	<option value="">Choisir</option>
+            		{this.state.jouetsDst.map((jouet) => (
+	            		<option key={jouet.id} value={jouet.id}>{jouet.nom}</option>
+	            	))}
+          		</FormControl>
+          		</FormGroup>
+       		)}
+       			 {this.state.ready === true && (
+              <div>
+       			 	<Button 
+					     onClick={this.demmandTroc} 
+					     block 
+					     bsSize="xs"
+          			type="submit"
+					     >
+					     Demander
+					   </Button>
+             {this.state.errorsDemand.map((error) => (
+              <div><font color='red' size='3'>{error}</font><br/></div>
+              ))}
+             </div>
+       			 )}
+			</td>
+			</section>
+		)
+	}
+}
+// yfugiohjpihou
 
 class AddJouet extends React.Component {
 	constructor(props) {
@@ -120,7 +254,6 @@ class AddJouet extends React.Component {
                     this.setState({success: true, errors: [], nomJouet: "", descriptionJouet: "", statutJouet: {value: ""}});
                     var session = JSON.parse(localStorage.getItem("session"));
                     session.jouets.push(data.jouet);
-                    alert(data.jouet);
                     localStorage.setItem("session", JSON.stringify(session));
                     setTimeout( () => { window.location.href = "/mesjouets"; },250);
                 } else if (data.rep == "failed") {
