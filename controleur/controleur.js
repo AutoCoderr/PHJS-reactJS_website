@@ -19,6 +19,7 @@ function Controleur() {
             delete result.passwd;
             delete result.banned;
             delete result.jouets;
+            delete result.MPs;
             result.token = Math.round(1+Math.random()*(Math.pow(10,12)-1));
             callback(null,result);
           }
@@ -43,7 +44,7 @@ function Controleur() {
           var sha1Passwd = sha1.digest("hex");
           var date = new Date();
           var curDateTime = (1900+date.getYear())+"/"+(date.getMonth()+1)+"/"+date.getDate()+" "+date.getHours()+":"+date.getMinutes();
-          this.modele.insertInto("users",{prenom: prenom, nom: nom, perm: perm, metier: metier, age: age, datetime: curDateTime, passwd: sha1Passwd, jouets: [], banned: 0},(error,result) => {
+          this.modele.insertInto("users",{prenom: prenom, nom: nom, perm: perm, metier: metier, age: age, datetime: curDateTime, passwd: sha1Passwd, MPs: [], jouets: [], banned: 0},(error,result) => {
             if (error) {
               callback(error);
             } else {
@@ -52,6 +53,7 @@ function Controleur() {
                 delete result.passwd;
                 delete result.banned;
                 delete result.jouets;
+                delete result.MPs;
                 result.token = Math.round(1+Math.random()*(Math.pow(10,12)-1));
                 callback(null,result);
               });
@@ -299,16 +301,14 @@ function Controleur() {
   }
 
   this.getOwnJouet = (id,callback) => {
-    this.modele.getFrom("users",{}, (error,result) => {
+    this.modele.getFrom("users",{_id: id}, (error,result) => {
       if (error) {
         callback(error);
       } else {
-        var comptes = {};
-        var jouets;
-        for (var i=0;i<result.length;i++) {
-          if (result[i]._id == id) {
-            callback(null,result[i].jouets);
-          }
+        if (result.length == 0) {
+          callback("Votre compte n'a pas été trouvé");
+        } else {
+          callback(null,result[0].jouets);
         }
       }
     });
