@@ -6,16 +6,13 @@ export class Index extends React.Component {
 		super(props);
 		this.state = {
 			comptes: [],
-			errors: [],
-			getJouetsStarted: false
+			errors: []
 		}
+		this.getJouets.bind(this);
+		this.getJouets();
 	}
 
 	getJouets() {
-		if (this.state.getJouetsStarted == true) {
-			return;
-		}
-		this.setState({getJouetsStarted: true});
 		 $.post(
             'http://'+window.location.hostname+':8000/jouets/getAllJouets.phjs',
             {
@@ -40,11 +37,10 @@ export class Index extends React.Component {
 		}
         return(
 		<center className="lesJouets">
-		{this.getJouets()}
 		{this.state.errors.map((error) => (<div><font size='3' color='red'> - {error}</font><br/></div>))}
 		<table><tr>
 		{Object.keys(this.state.comptes).map((id, index) => (
-			<td>
+			<td style={{verticalAlign: 'top'}}>
 				<table>
 					<tr style={{border: '1pt solid black'}}>
 						<td style={{textAlign: 'center'}}>
