@@ -41,31 +41,22 @@ if (errors.length == 0) {
 		--END--
 	} else {
 
-		var idJouetSrc = PHJS.args.POST.idJouetSrc.content;
+		var idJouetSrc = parseInt(PHJS.args.POST.idJouetSrc.content);
 
-		var idCompteDst = PHJS.args.POST.idCompteDst.content;
-		var idJouetDst = PHJS.args.POST.idJouetDst.content;
+		var idCompteDst = parseInt(PHJS.args.POST.idCompteDst.content);
+		var idJouetDst = parseInt(PHJS.args.POST.idJouetDst.content);
 
-		console.log("idCompteSrc : "+idCompteSrc);
-		console.log("idJouetSrc : "+idJouetSrc);
-		console.log("idJouetDst : "+idJouetDst);
-		console.log("idCompteDst : "+idCompteDst);
-
-		echo_json({rep: "failed", errors: ["NTM"]});
-
-		--END--
-
-		/*var Controleur = require(PHJS.cd+"/../controleur/controleur.js");
+		var Controleur = require(PHJS.cd+"/../controleur/controleur.js");
 		var controleur = new Controleur();
 
-		controleur.demmandJouet(idCompteSrc,idJouetSrc,idCompteDst,idJouetDst,(error,jouet) => {
+		controleur.demandTroc(idCompteSrc,idJouetSrc,idCompteDst,idJouetDst,(error,jouet) => {
 			if (error) {
 				echo_json({rep: "failed", errors: [error]});
 			} else {
 				echo_json ({rep: "success"});
 			}
 			--END--
-		});*/
+		});
 	}
 } else {
 	echo_json ({rep: "failed", errors: errors});

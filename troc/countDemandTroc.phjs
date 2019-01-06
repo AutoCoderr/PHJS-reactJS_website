@@ -1,0 +1,42 @@
+<?phjs
+
+var errors = [];
+
+if (typeof(PHJS.args.POST.token) == "undefined") {
+	errors.push("Token non renseigné");
+} else if (PHJS.args.POST.token.content == "") {
+	errors.push("Token non renseigné");
+}
+
+
+if (errors.length == 0) {
+
+	var id = false;
+	for (var i=0;i<PHJS.global.sessions.length;i++) {
+		if (PHJS.global.sessions[i].token == PHJS.args.POST.token.content) {
+			id = PHJS.global.sessions[i]._id;
+		}
+	}
+
+	if (id === false) {
+		echo_json({rep: "failed", errors: "Vous n'êtes pas connecté"});
+		--END--
+	} else {
+
+		var Controleur = require(PHJS.cd+"/../controleur/controleur.js");
+		var controleur = new Controleur();
+
+		controleur.countDemandTroc(id,(error,count) => {
+			if (error) {
+				echo_json({rep: "failed", errors: [error]});
+			} else {
+				echo_json ({rep: "success", count: count});
+			}
+			--END--
+		});
+	}
+} else {
+	echo_json ({rep: "failed", errors: errors});
+	--END--
+}
+?>

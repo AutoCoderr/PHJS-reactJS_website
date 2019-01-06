@@ -47,14 +47,11 @@ function Modele(db,server,port) {
   		if (error) {
         callback(error);
       } else {
-  			var nb = 0;
         this.getFrom(collection,{}, (error,result) => {
           if (error) {
             callback(error);
           } else {
-            nb = result.length;
-            obj._id = nb+1;
-            console.log(obj);
+            obj._id = result.length+1;
             db.db(this.db).collection(collection).insertOne(obj, (err, res) => {
                 if (err) {
                   callback(err);
