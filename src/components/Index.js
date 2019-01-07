@@ -47,14 +47,14 @@ export class Index extends React.Component {
 							<strong>{this.state.comptes[id].prenom} {this.state.comptes[id].nom}</strong>
 						</td>
 					</tr>
-					{this.state.comptes[id].jouets.length == 0 && (<tr><td><font color='orange' size='3'>Il n'y a aucun jouet</font></td></tr>)}
+					{this.state.comptes[id].jouets.length == 0 && (<tr><td><font color='orange' size='3'>Il n'a aucun jouet</font></td></tr>)}
 					{this.state.comptes[id].jouets.map((jouet) => (
 						<tr style={{border: '1pt solid black'}}>
 							{/* [{id: 1, nom: "Sniper", description: "nique t'a mere"}] */}
 							<td style={{textAlign: 'center'}}>
 								{jouet.nom}
 								<br/>
-								<img src={'http://'+window.location.hostname+':8000/imgs/jouets/'+jouet.id+'.jpg'} />
+								<img style={{width: '260px'},{height: '200px'}} src={'http://'+window.location.hostname+':8000/imgs/jouets/'+id+'-'+jouet.id+'.jpg'} />
 								<br/>
 								{jouet.description}
 							</td>

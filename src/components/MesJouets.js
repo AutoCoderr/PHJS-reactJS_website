@@ -73,7 +73,7 @@ export class MesJouets extends React.Component {
 				<td style={{textAlign: 'center'}}>
 					{this.state.jouets[i].nom}
 					<br/>
-					<img src={'http://'+window.location.hostname+':8000/imgs/jouets/'+this.state.jouets[i].id+'.jpg'} />
+					<img style={{width: '260px'},{height: '200px'}} src={'http://'+window.location.hostname+':8000/imgs/jouets/'+JSON.parse(localStorage.getItem("session"))._id+'-'+this.state.jouets[i].id+'.jpg'} />
 					<br/>
 					{this.state.jouets[i].description}
 					<br/>
@@ -93,6 +93,8 @@ export class MesJouets extends React.Component {
 }
 // uioijpokp
 
+
+
 class ChaqueJouet extends React.Component {
 	constructor(props) {
 		super(props);
@@ -107,12 +109,9 @@ class ChaqueJouet extends React.Component {
 			comptes: props.comptes,
 			jouet: props.jouet,
 			jouetIndex: props.jouetIndex,
+      supprJouetStarted: false,
 			ready: false
 		}
-    console.log("this.state.comptes : ");
-    console.log(this.state.comptes);
-		console.log("props : ");
-		console.log(props);
 		this.displayJouets.bind(this);
 		this.demandTroc.bind(this);
 	}
@@ -135,6 +134,10 @@ class ChaqueJouet extends React.Component {
 	}
 
 	supprJouet = () => {
+      if (this.state.supprJouetStarted == true) {
+        return;
+      }
+      this.setState({supprJouetStarted: true});
     	var id = this.state.jouet.id;
 
     	$.post(
@@ -147,12 +150,9 @@ class ChaqueJouet extends React.Component {
             (data) => {
                 if (data.rep == "success") {
                 	this.setState({successSuppr: true, errorsSuppr: []})
-                	var session = JSON.parse(localStorage.getItem("session"));
-                	session.jouets.splice(this.state.jouetIndex,1);
-                	localStorage.setItem("session", JSON.stringify(session));
                 	setTimeout( function() { window.location.href = "/mesjouets"; },250);
                 } else if (data.rep == "failed") {
-                    this.setState({successSuppr: false, errorsSuppr: data.errors});
+                  this.setState({successSuppr: false, errorsSuppr: data.errors});
                 }
             },
             'json'
@@ -192,7 +192,7 @@ class ChaqueJouet extends React.Component {
 				>
 				Supprimer
 				</Button>
-        {this.state.successSuppr === true && (<font color='green' size='3'>Suppression réussi</font>)}
+        {this.state.successSuppr === true && (<div><br/><font color='green' size='3'>Suppression réussi</font></div>)}
         {this.state.errorsSuppr.map((error) => (
             <div><font color='red' size='3'>{error}</font><br/></div>
         ))}
@@ -251,6 +251,8 @@ class ChaqueJouet extends React.Component {
 }
 // yfugiohjpihou
 
+
+
 class AddJouet extends React.Component {
 	constructor(props) {
 		super(props);
@@ -259,10 +261,11 @@ class AddJouet extends React.Component {
 			errors: [],
 			nomJouet: "",
 			descriptionJouet: "",
-			statutJouet: {value: ""}
+			statutJouet: {value: ""},
+      imageJouet: ""
 		}
 		this.handleChange.bind(this);
-        this.addJouet.bind(this);
+    this.addJouet.bind(this);
 	}
 
 	handleChange = event => {
@@ -271,19 +274,42 @@ class AddJouet extends React.Component {
         });
     }
 
+  handleChangeFile = event => {
+      this.setState({imageJouet: event.target.files[0]});
+  }
+
 	addJouet = () => {
-		console.log("start addJouet");
-		var nom = this.state.nomJouet;
-		var description = this.state.descriptionJouet;
-		var statut = this.state.statutJouet.value;
-		$.post(
+		var formData = new FormData();
+    formData.append("nom",this.state.nomJouet);
+    formData.append("description",this.state.descriptionJouet);
+    formData.append("statut",this.state.statutJouet.value);
+    formData.append("image",this.state.imageJouet);
+    formData.append("token",JSON.parse(localStorage.getItem("session")).token);
+    $.ajax({
+        url:'http://'+window.location.hostname+':8000/jouets/addJouets.phjs',
+        data:formData,
+        type:'POST',
+        processData: false,
+        dataType: 'json',
+        enctype: 'multipart/form-data',
+        contentType: false,
+        success: (data) =>
+        {
+          if (data.rep == "success") {
+            this.setState({success: true, errors: [], nomJouet: "", descriptionJouet: "", statutJouet: {value: ""}});
+            setTimeout( () => { window.location.href = "/mesjouets"; },250);
+          } else if (data.rep == "failed") {
+            this.setState({success: false, errors: data.errors});
+          }
+        },
+        error:function(xhr,rrr,error)
+        {
+            alert(error);
+        }
+    });
+		/*$.post(
             'http://'+window.location.hostname+':8000/jouets/addJouets.phjs',
-            {
-               nom: nom,
-               description: description,
-               statut: statut,
-               token: JSON.parse(localStorage.getItem("session")).token
-            },
+            formData,
     
             (data) => {
                 if (data.rep == "success") {
@@ -297,7 +323,7 @@ class AddJouet extends React.Component {
                 }
             },
             'json'
-        );
+        );*/
 	}
 
     render() {
@@ -309,34 +335,35 @@ class AddJouet extends React.Component {
 		<div className="AddJouet">
 		<h2>Ajouter un jouets</h2>
 		<FormGroup controlId="nomJouet" bsSize="large">
-           <ControlLabel>Nom du jouet</ControlLabel>
-           <FormControl autoFocus type="text" value={this.state.nomJouet} onChange={this.handleChange}/>
-        </FormGroup>
-        <FormGroup controlId="descriptionJouet" bsSize="large">
-           <ControlLabel>Description du jouet</ControlLabel>
-           <FormControl autoFocus type="text" value={this.state.descriptionJouet} onChange={this.handleChange}/>
-        </FormGroup>
-        <FormGroup controlId="statutJouet">
-          <ControlLabel>Son statut</ControlLabel>
-          <FormControl
-              inputRef={ el => this.state.statutJouet = el}
-              componentClass="select" placeholder="select">
-            <option value="">Choisissez</option>
-            <option value="public">Public</option>
-            <option value="prive">Privé</option>
-          </FormControl>
-        </FormGroup>
-        {this.state.success === true && (<font color='green' size='3'>Ajout reussi!</font>)}
-        {this.state.errors.map((error) => (<div><font size='3' color='red'> - {error}</font><br/></div>))}
-         <Button
-           onClick={this.addJouet}
-           block
-           bsSize="large"
-           type="submit"
-          >
-           Ajouter
-         </Button>
-     	</div>
+      <ControlLabel>Nom du jouet</ControlLabel>
+      <FormControl autoFocus type="text" value={this.state.nomJouet} onChange={this.handleChange}/>
+    </FormGroup>
+    <FormGroup controlId="descriptionJouet" bsSize="large">
+      <ControlLabel>Description du jouet</ControlLabel>
+      <FormControl autoFocus type="text" value={this.state.descriptionJouet} onChange={this.handleChange}/>
+    </FormGroup>
+    <input type="file" onChange={this.handleChangeFile}/>
+    <FormGroup controlId="statutJouet">
+      <ControlLabel>Son statut</ControlLabel>
+      <FormControl
+          inputRef={ el => this.state.statutJouet = el}
+          componentClass="select" placeholder="select">
+        <option value="">Choisissez</option>
+        <option value="public">Public</option>
+        <option value="prive">Privé</option>
+      </FormControl>
+    </FormGroup>
+    {this.state.success === true && (<font color='green' size='3'>Ajout reussi!</font>)}
+    {this.state.errors.map((error) => (<div><font size='3' color='red'> - {error}</font><br/></div>))}
+    <Button
+      onClick={this.addJouet}
+      block
+      bsSize="large"
+      type="submit"
+    >
+    Ajouter
+    </Button>
+    </div>
         )
     }
 
