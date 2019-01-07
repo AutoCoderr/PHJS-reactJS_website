@@ -44,7 +44,7 @@ function Controleur() {
           var sha1Passwd = sha1.digest("hex");
           var date = new Date();
           var curDateTime = (1900+date.getYear())+"/"+(date.getMonth()+1)+"/"+date.getDate()+" "+date.getHours()+":"+date.getMinutes();
-          this.modele.insertInto("users",{prenom: prenom, nom: nom, perm: perm, metier: metier, age: age, datetime: curDateTime, passwd: sha1Passwd, MPs: [], jouets: [], banned: 0},(error,result) => {
+          this.modele.insertInto("users",{prenom: prenom, nom: nom, perm: perm, metier: metier, age: age, datetime: curDateTime, passwd: sha1Passwd, MPs: [], MSs: [], jouets: [], banned: 0},(error,result) => {
             if (error) {
               callback(error);
             } else {
@@ -125,7 +125,7 @@ function Controleur() {
     });
   }
 
-  this.addJouet = (id,nom,description,statut,callback) => {
+  this.addJouet = (id,nom,description,statut,imagePath,callback) => {
     this.modele.getFrom("users",{_id: id}, (error,result) => {
       if (error) {
         callback(error);
@@ -145,7 +145,13 @@ function Controleur() {
             if (error) {
               callback(error);
             } else {
-              callback(null,newJouet);
+              var shell = require("shelljs");
+              var out = shell.exec("mv "+imagePath+" /root/projects/node+react/backend/imgs/jouets/"+id+"-"+idJouet+".jpg");
+              if (out.stderr != "") {
+                callback(out.stderr);
+              } else {
+                callback(null,"OK");
+              }
             }
           });
         }
@@ -178,7 +184,13 @@ function Controleur() {
               if (error) {
                 callback(error);
               } else {
-                callback(null);
+                var shell = require("shelljs");
+                var out = shell.exec("rm /root/projects/node+react/backend/imgs/jouets/"+idUser+"-"+idJouet+".jpg");
+                if (out.stderr != "") {
+                  callback(out.stderr);
+                } else {
+                  callback(null,"OK");
+                }
               }
             });
           }
@@ -365,6 +377,29 @@ function Controleur() {
                         if (error) {
                           callback(error);
                         } else {
+                          var shell = require("shelljs");
+
+                          var tmpname = Math.round(Math.random()*Math.pow(10,5));
+
+                          var out;
+
+                          out = shell.exec("mv /root/projects/node+react/backend/imgs/jouets/"+demand.idCompteSrc+"-"+demand.idJouetSrc+".jpg /root/projects/node+react/backend/imgs/jouets/"+tmpname+".jpg");
+                          if (out.stderr != "") {
+                            callback(out.stderr);
+                            return;
+                          }
+
+                          out = shell.exec("mv /root/projects/node+react/backend/imgs/jouets/"+demand.idCompteDst+"-"+demand.idJouetDst+".jpg /root/projects/node+react/backend/imgs/jouets/"+demand.idCompteSrc+"-"+demand.idJouetDst+".jpg");
+                          if (out.stderr != "") {
+                            callback(out.stderr);
+                            return;
+                          }
+
+                          out = shell.exec("mv /root/projects/node+react/backend/imgs/jouets/"+tmpname+".jpg /root/projects/node+react/backend/imgs/jouets/"+demand.idCompteDst+"-"+demand.idJouetSrc+".jpg");
+                          if (out.stderr != "") {
+                            callback(out.stderr);
+                            return;
+                          }
                           callback(null,"OK");
                         }
                       });
