@@ -20,6 +20,7 @@ function Controleur() {
             delete result.banned;
             delete result.jouets;
             delete result.MPs;
+            delete result.MSs;
             result.token = Math.round(1+Math.random()*(Math.pow(10,12)-1));
             callback(null,result);
           }
@@ -54,6 +55,7 @@ function Controleur() {
                 delete result.banned;
                 delete result.jouets;
                 delete result.MPs;
+                delete result.MSs;
                 result.token = Math.round(1+Math.random()*(Math.pow(10,12)-1));
                 callback(null,result);
               });
@@ -413,6 +415,132 @@ function Controleur() {
       }
     });
   }
+
+  this.getMessages = (id,callback) => {
+    this.modele.getFrom("users",{_id: id}, (error,result) => {
+      if (error) {
+        callback(error);
+      } else {
+        if (result.length == 0) {
+          callback("votre compte n'a pas été trouvé");
+        } else {
+          result = result[0];
+          callback(null,{MPs: result.MPs, MSs: result.MSs});
+        }
+      }
+    });
+  }
+
+  this.sendMessage = (id,dst,objet,content,callback) => {
+    this.modele.getFrom("users",{_id: id},(error,resultSrc) => {
+      if (error) {
+        callback(error);
+      } else {
+        if (resultSrc.length == 0) {
+          callback("Votre compte n'a pas été trouvé");
+        } else {
+          resultSrc = resultSrc[0];
+          this.modele.getFrom("users",{_id: dst},(error,resultDst) => {
+            if (error) {
+              callback(error);
+            } else {
+              if (resultDst.length == 0) {
+                callback("Le compte de destination n'a pas été trouvé");
+              } else {
+
+                resultDst = resultDst[0];
+                var date = new Date();
+                var curDateTime = (1900+date.getYear())+"/"+(date.getMonth()+1)+"/"+date.getDate()+" "+date.getHours()+":"+date.getMinutes();
+                resultSrc.MSs.push({id: resultSrc.MSs.length+1, dst: dst, prenom: resultDst.prenom, nom: resultDst.nom, objet: objet, content: content, datetime: curDateTime});
+                resultDst.MPs.push({id: resultDst.MPs.length+1, src: id, prenom: resultSrc.prenom, nom: resultSrc.nom, objet: objet, content: content, datetime: curDateTime});
+                this.modele.update("users",{_id: id},{$set: {MSs: resultSrc.MSs}}, (error,result) => {
+                  if (error) {
+                    callback(error);
+                  } else {
+                    this.modele.update("users",{_id: dst},{$set: {MPs: resultDst.MPs}}, (error,result) => {
+                      if (error) {
+                        callback(error);
+                      } else {
+                        callback(null,"OK");
+                      }
+                    });
+                  }
+                });
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+
+  this.supprMessage = (id,idMsg,type,callback) => {
+    this.modele.getFrom("users",{_id: id},(error,result) => {
+      if (error) {
+        callback(error);
+      } else {
+        if (result.length == 0) {
+          callback("Votre compte n'a pas été trouvé");
+        } else {
+          result = result[0];
+          var deleted = false;
+          if (type == "MP") {
+            for (var i=0;i<result.MPs.length;i++) {
+              if (result.MPs[i].id == idMsg) {
+                result.MPs.splice(i,1);
+                deleted = true;
+              }
+            }
+          } else if (type == "MS") {
+            for (var i=0;i<result.MSs.length;i++) {
+              if (result.MSs[i].id == idMsg) {
+                result.MSs.splice(i,1);
+                deleted = true;
+              }
+            }
+          }
+          if (deleted === false) {
+            callback("Jouet non trouvé");
+          } else {
+            if (type == "MP") {
+              this.modele.update("users",{_id: id},{$set: {MPs: result.MPs}},(error, result) => {
+                if (error) {
+                  callback(error);
+                } else {
+                  callback(null,"OK");
+                }
+              });
+            } else if (type == "MS") {
+              this.modele.update("users",{_id: id},{$set: {MSs: result.MSs}},(error, result) => {
+                if (error) {
+                  callback(error);
+                } else {
+                  callback(null,"OK");
+                }
+              });
+            }
+          }
+        }
+      }
+    });
+  }
+
+  this.getComptes = (id,callback) => {
+    this.modele.getFrom("users",{},(error,result) => {
+      if (error) {
+        callback(error);
+      } else {
+        var comptes = [];
+        for (var i=0;i<result.length;i++) {
+          if (result[i]._id != id) {
+            comptes.push({id: result[i]._id, prenom: result[i].prenom, nom: result[i].nom});
+          }
+        }
+        callback(null,comptes);
+      }
+    });
+  }
+
 };
 
 
