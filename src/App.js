@@ -7,6 +7,7 @@ import { Admin } from './components/Admin.js';
 import { Index } from './components/Index.js';
 import { MesJouets } from './components/MesJouets.js';
 import { Demands } from './components/Demands.js';
+import { Messages } from './components/Messages.js';
 //import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from "react-bootstrap";
 //import { Button, Navbar, Nav, NavItem, NavDropdown, MenuItem } from "reactstrap";
 import $ from 'jquery';
@@ -52,6 +53,7 @@ class App extends Component {
                     <Route exact path ="/admin" component={Admin} />
                     <Route exact path ="/mesjouets" component={MesJouets} />
                     <Route exact path ="/demands" component={Demands} />
+                    <Route exact path ="/messages" component={Messages} />
                 </Switch>
             </div>
         </div>
@@ -132,6 +134,12 @@ class Header extends Component {
 
 	            </ul>
 	            <ul className="nav navbar-nav navbar-right">
+	            	 {isAuth === 1 && (
+	            	 	<li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "messages") ? "active nav-item" : "nav-item"}>
+    				 		<a className="nav-link" href="/messages"><span className="glyphicon glyphicon-log-in">
+    							</span>Messages privés</a>
+    				 	</li>
+	            	 )}
 	        		 <li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "signup") ? "active nav-item" : "nav-item"}>
 	        			<a className="nav-link" href="/signup">
 	        				<span className="glyphicon glyphicon-user"></span>
@@ -139,9 +147,10 @@ class Header extends Component {
 	        			</a>
 	        		 </li>
 
-    				    <li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "login") ? "active nav-item" : "nav-item"}><a className="nav-link" href="/login"><span className="glyphicon glyphicon-log-in">
-    					   </span>{isAuth == 1 ? "Deconnexion" : "Connexion"}</a>
-    				    </li>
+    				 <li className={(window.location.href.split("/")[window.location.href.split("/").length-1] === "login") ? "active nav-item" : "nav-item"}>
+    				 	<a className="nav-link" href="/login"><span className="glyphicon glyphicon-log-in">
+    						</span>{isAuth == 1 ? "Deconnexion" : "Connexion"}</a>
+    				 </li>
       			 </ul>
 	    		</div>
 			</nav>
