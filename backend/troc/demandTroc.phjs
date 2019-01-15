@@ -1,0 +1,65 @@
+<?phjs
+
+var errors = [];
+
+if (typeof(PHJS.args.POST.token) == "undefined") {
+	errors.push("Token non renseigné");
+} else if (PHJS.args.POST.token.content == "") {
+	errors.push("Token non renseigné");
+}
+
+if (typeof(PHJS.args.POST.idJouetDst) == "undefined") {
+	errors.push("idJouetDst non renseigné");
+} else if (PHJS.args.POST.idJouetDst.content == "") {
+	errors.push("idJouetDst non renseigné");
+}
+
+if (typeof(PHJS.args.POST.idCompteDst) == "undefined") {
+	errors.push("idCompteDst non renseigné");
+} else if (PHJS.args.POST.idCompteDst.content == "") {
+	errors.push("idCompteDst non renseigné");
+}
+
+if (typeof(PHJS.args.POST.idJouetSrc) == "undefined") {
+	errors.push("idJouetSrc non renseigné");
+} else if (PHJS.args.POST.idJouetSrc.content == "") {
+	errors.push("idJouetSrc non renseigné");
+}
+
+
+if (errors.length == 0) {
+
+	var idCompteSrc = false;
+	for (var i=0;i<PHJS.global.sessions.length;i++) {
+		if (PHJS.global.sessions[i].token == PHJS.args.POST.token.content) {
+			idCompteSrc = PHJS.global.sessions[i]._id;
+		}
+	}
+
+	if (idCompteSrc === false) {
+		echo_json({rep: "failed", errors: "Vous n'êtes pas connecté"});
+		--END--
+	} else {
+
+		var idJouetSrc = parseInt(PHJS.args.POST.idJouetSrc.content);
+
+		var idCompteDst = parseInt(PHJS.args.POST.idCompteDst.content);
+		var idJouetDst = parseInt(PHJS.args.POST.idJouetDst.content);
+
+		var Controleur = require(PHJS.cd+"/../controleur/controleur.js");
+		var controleur = new Controleur();
+
+		controleur.demandTroc(idCompteSrc,idJouetSrc,idCompteDst,idJouetDst,(error,jouet) => {
+			if (error) {
+				echo_json({rep: "failed", errors: [error]});
+			} else {
+				echo_json ({rep: "success"});
+			}
+			--END--
+		});
+	}
+} else {
+	echo_json ({rep: "failed", errors: errors});
+	--END--
+}
+?>

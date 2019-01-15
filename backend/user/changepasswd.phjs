@@ -1,0 +1,46 @@
+<?phjs
+var errors = [];
+
+if (typeof(PHJS.args.POST.token) == "undefined") {
+	errors.push('Token non renseigné');
+} else if (PHJS.args.POST.token.content == "") {
+	errors.push('Token non renseigné');
+}
+
+if (typeof(PHJS.args.POST.passwd) == "undefined") {
+	errors.push('toSet non renseigné');
+} else if (PHJS.args.POST.passwd.content == "") {
+	errors.push('toSet non renseigné');
+}
+
+if (errors.length == 0) {
+	if (typeof(PHJS.global.sessions) == "undefined") {
+		PHJS.global.sessions = [];
+	}
+	var _id = false;
+	for (var i=0;i<PHJS.global.sessions.length;i++) {
+		if (PHJS.global.sessions[i].token == PHJS.args.POST.token.content) {
+			_id = PHJS.global.sessions[i]._id;
+		}
+	}
+	if (_id == false) {
+		echo_json({rep: "failed", errors: ["Vous n'êtes pas connecté"]});
+		--END--
+	} else {
+		var Controleur = require(PHJS.cd+"/../controleur/controleur.js");
+		var controleur = new Controleur();
+		var password = PHJS.args.POST.passwd.content;
+		controleur.changePasswd(_id,password,(error,result) => {
+			if (error) {
+				echo_json({rep: "failed", errors: [error]});
+			} else {
+				echo_json({rep: "success"});
+			}
+			--END--
+		});
+	}
+} else {
+	echo_json ({rep: "failed", errors: errors});
+	--END--
+}
+?>

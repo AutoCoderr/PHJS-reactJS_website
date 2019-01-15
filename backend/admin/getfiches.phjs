@@ -1,0 +1,40 @@
+<?phjs
+if (typeof(PHJS.args.POST.token) == "undefined") {
+	echo_json ({rep: "failed", errors: ['Token non renseigné']});
+	--END--
+} else if (PHJS.args.POST.token.content == "") {
+	echo_json ({rep: "failed", errors: ['Token non renseigné']});
+	--END--
+} else {
+	if (typeof(PHJS.global.sessions) == "undefined") {
+	PHJS.global.sessions = [];
+	}
+
+	var _id = false;
+	var perm = false;
+	for (var i=0;i<PHJS.global.sessions.length; i++) {
+		if (PHJS.global.sessions[i].token == PHJS.args.POST.token.content) {
+			_id = PHJS.global.sessions[i]._id;
+			perm = PHJS.global.sessions[i].perm;
+		}
+	}
+	if (_id == false) {
+		echo_json ({rep: "failed", errors: ["Vous n'êtes pas connecté"]});
+		--END--
+	} else if (perm != "admin" & perm != "superadmin") {
+		echo_json ({rep: "failed", errors: ["Vous n'avez pas les permissions néccessaires"]});
+		--END--
+	} else {
+		var Controleur = require(PHJS.cd+"/../controleur/controleur.js");
+		var controleur = new Controleur();
+		controleur.getOtherFiches(_id, (error,comptes) => {
+			if (error) {
+				echo_json({rep: "failed", errors: [error]});
+			} else {
+				echo_json ({rep: "success", comptes: comptes});
+			}
+			--END--
+		});
+	}
+}
+?>

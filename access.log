@@ -1,0 +1,5 @@
+There is the log file : 
+2019/1/15  14:13:38 => 127.0.0.1 => GET http://127.0.0.1:8000/ CODE 200 ; Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:64.0) Gecko/20100101 Firefox/64.0 
+2019/1/15  14:13:38 => 127.0.0.1 => GET http://127.0.0.1:8000/favicon.ico CODE 404 ; Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:64.0) Gecko/20100101 Firefox/64.0 PAGE NOT FOUND
+2019/1/15  14:13:41 => 127.0.0.1 => GET http://127.0.0.1:8000/jouets/ CODE 200 ; Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:64.0) Gecko/20100101 Firefox/64.0 
+2019/1/15  14:13:42 => 127.0.0.1 => GET http://127.0.0.1:8000/jouets/getAllJouets.phjs CODE 200 ; Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:64.0) Gecko/20100101 Firefox/64.0 

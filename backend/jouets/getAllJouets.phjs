@@ -1,0 +1,12 @@
+<?phjs
+var Controleur = require(PHJS.cd+"/../controleur/controleur.js");
+var controleur = new Controleur();
+controleur.getAllJouets((error,comptes) => {
+	if (error) {
+		echo_json({rep: "failed", errors: [error]});
+	} else {
+		echo_json ({rep: "success", comptes: comptes});
+	}
+	--END--
+});
+?>

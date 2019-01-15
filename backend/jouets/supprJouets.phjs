@@ -1,0 +1,49 @@
+<?phjs
+
+var errors = [];
+
+if (typeof(PHJS.args.POST.token) == "undefined") {
+	errors.push("Token non renseigné");
+} else if (PHJS.args.POST.token.content == "") {
+	errors.push("Token non renseigné");
+}
+
+if (typeof(PHJS.args.POST.idJouet) == "undefined") {
+	errors.push("idJouet non renseigné");
+} else if (PHJS.args.POST.idJouet.content == "") {
+	errors.push("idJouet non renseigné");
+}
+
+if (errors.length == 0) {
+
+	var idUser = false;
+	for (var i=0;i<PHJS.global.sessions.length;i++) {
+		if (PHJS.global.sessions[i].token == PHJS.args.POST.token.content) {
+			idUser = PHJS.global.sessions[i]._id;
+		}
+	}
+
+	if (idUser === false) {
+		echo_json({rep: "failed", errors: "Vous n'êtes pas connecté"});
+		--END--
+	} else {
+
+		var idJouet = PHJS.args.POST.idJouet.content;
+
+		var Controleur = require(PHJS.cd+"/../controleur/controleur.js");
+		var controleur = new Controleur();
+
+		controleur.supprJouet(idUser,idJouet,(error,jouet) => {
+			if (error) {
+				echo_json({rep: "failed", errors: [error]});
+			} else {
+				echo_json ({rep: "success"});
+			}
+			--END--
+		});
+	}
+} else {
+	echo_json ({rep: "failed", errors: errors});
+	--END--
+}
+?>
